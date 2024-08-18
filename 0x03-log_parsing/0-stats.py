@@ -20,7 +20,7 @@ def print_result(size, status_dict):
         status_dict: A dictionary containing status code counts.
     """
     print(f"File size: {size}")
-    for key, value in status_dict.items():
+    for key, value in sorted(status_dict.items()):
         print(f"{key}: {value}")
 
 
