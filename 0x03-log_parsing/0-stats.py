@@ -7,11 +7,10 @@
 """
 import sys
 import re
-import signal
 import typing
 
 
-def print_result(size, status_dict):
+def print_result(size: int, status_dict: dict):
     """
     Prints the calculated file size and status code counts.
 
@@ -23,15 +22,6 @@ def print_result(size, status_dict):
     for key, value in sorted(status_dict.items()):
         print(f"{key}: {value}")
 
-
-def signal_handler(signal, frame):
-    """
-        Handles the SIGINT signal (Ctrl+C) by printing results and exiting.
-    """
-    print_result(total_size, new)
-    sys.exit(0)
-
-
 if __name__ == '__main__':
     counter: int = 0
     total_size: int = 0
@@ -41,18 +31,23 @@ if __name__ == '__main__':
     pattern: str = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] \"GET /projects/\d+ HTTP/1\.1\" \d{3} \d+"""
 
     # read from stdin
-    for line in sys.stdin:
-        if counter == 10:
-            print_result(total_size, status)
-            counter = 0
-        matches = re.findall(pattern, line)
-        if matches:
-            stat, size = re.findall(r"\d{3} \d+", line)[0].split(' ')
-            total_size += int(size)
-            if status.get(stat) is None:
-                value = 1
-            else:
-                value += 1
-            status[stat] = value
-        counter += 1
-    signal.signal(signal.SIGINT, signal_handler)
+    try:
+        for line in sys.stdin:
+            matches = re.findall(pattern, line)
+            if matches:
+                stat, size = re.findall(r"\d{3} \d+", line)[0].split(' ')
+                total_size += int(size)
+                if status.get(stat) is None:
+                    value = 1
+                else:
+                    value += 1
+                status[stat] = value
+
+            if counter == 10:
+                print_result(total_size, status)
+                counter = 0
+            counter += 1
+
+    except KeyboardInterrupt:
+        print_result(total_size, status)
+        raise
