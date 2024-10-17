@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """0. Prime Game """
 
+
 def isWinner(x, nums):
     """Return: name of the player that won the most rounds"""
     if x < 1 or not nums:
@@ -34,4 +35,3 @@ def isWinner(x, nums):
         return "Ben"
     else:
         return None
-
